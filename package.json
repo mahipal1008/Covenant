@@ -1,0 +1,43 @@
+{
+  "name": "covenant",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Covenant - a living intelligence layer for SaaS codebases.",
+  "workspaces": [
+    "packages/shared",
+    "packages/analyzer",
+    "packages/db",
+    "packages/cli",
+    "apps/api",
+    "apps/web"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c cyan,magenta \"npm run dev -w @covenant/api\" \"npm run dev -w @covenant/web\"",
+    "dev:api": "npm run dev -w @covenant/api",
+    "dev:web": "npm run dev -w @covenant/web",
+    "build": "npm run build -w @covenant/shared && npm run build -w @covenant/analyzer && npm run build -w @covenant/api && npm run build -w @covenant/web",
+    "typecheck": "npm run typecheck -w @covenant/shared && npm run typecheck -w @covenant/analyzer && npm run typecheck -w @covenant/api && npm run typecheck -w @covenant/web",
+    "test": "npm run test -w @covenant/analyzer && npm run test -w @covenant/api",
+    "db:generate": "npm run generate -w @covenant/db",
+    "db:seed": "npm run seed -w @covenant/db",
+    "gen:agent": "node tools/gen-agent.mjs",
+    "gen:route": "node tools/gen-route.mjs",
+    "check:classification": "node tools/check-classification.mjs",
+    "check:classification:strict": "node tools/check-classification.mjs --strict",
+    "size:check": "size-limit"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "overrides": {
+    "postcss": "8.5.10",
+    "next": {
+      "postcss": "8.5.10"
+    }
+  }
+}

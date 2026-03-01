@@ -1,0 +1,27 @@
+node_modules
+.next
+dist
+coverage
+.env
+.env.local
+.env.*.local
+*.log
+*.tsbuildinfo
+test-out.txt
+test-final.log
+apps/web/.next
+apps/api/dist
+packages/*/dist
+packages/db/prisma/dev.db
+extensions/jetbrains/build
+extensions/jetbrains/.gradle
+extensions/jetbrains/.idea
+extensions/vscode/out
+extensions/vscode/*.vsix
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+# excluded per project owner
+.github/workflows/
+renovate.json
