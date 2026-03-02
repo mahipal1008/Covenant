@@ -1,0 +1,92 @@
+[
+  {
+    "name": "/ (home)",
+    "path": "apps/web/.next/static/chunks/app/page-*.js",
+    "limit": "70 kB",
+    "gzip": true
+  },
+  {
+    "name": "/pricing",
+    "path": "apps/web/.next/static/chunks/app/pricing/page-*.js",
+    "limit": "55 kB",
+    "gzip": true
+  },
+  {
+    "name": "/blog",
+    "path": "apps/web/.next/static/chunks/app/blog/page-*.js",
+    "limit": "55 kB",
+    "gzip": true
+  },
+  {
+    "name": "/blog/[slug]",
+    "path": "apps/web/.next/static/chunks/app/blog/[slug]/page-*.js",
+    "limit": "55 kB",
+    "gzip": true
+  },
+  {
+    "name": "/help",
+    "path": "apps/web/.next/static/chunks/app/help/page-*.js",
+    "limit": "65 kB",
+    "gzip": true
+  },
+  {
+    "name": "/help/[slug]",
+    "path": "apps/web/.next/static/chunks/app/help/[slug]/page-*.js",
+    "limit": "60 kB",
+    "gzip": true
+  },
+  {
+    "name": "/dashboard",
+    "path": "apps/web/.next/static/chunks/app/dashboard/page-*.js",
+    "limit": "120 kB",
+    "gzip": true
+  },
+  {
+    "name": "/login",
+    "path": "apps/web/.next/static/chunks/app/login/page-*.js",
+    "limit": "45 kB",
+    "gzip": true
+  },
+  {
+    "name": "/signup",
+    "path": "apps/web/.next/static/chunks/app/signup/page-*.js",
+    "limit": "45 kB",
+    "gzip": true
+  },
+  {
+    "name": "/agents",
+    "path": "apps/web/.next/static/chunks/app/agents/page-*.js",
+    "limit": "60 kB",
+    "gzip": true
+  },
+  {
+    "name": "/security",
+    "path": "apps/web/.next/static/chunks/app/security/page-*.js",
+    "limit": "50 kB",
+    "gzip": true
+  },
+  {
+    "name": "/privacy/data-request",
+    "path": "apps/web/.next/static/chunks/app/privacy/data-request/page-*.js",
+    "limit": "40 kB",
+    "gzip": true
+  },
+  {
+    "name": "/tech-radar",
+    "path": "apps/web/.next/static/chunks/app/tech-radar/page-*.js",
+    "limit": "45 kB",
+    "gzip": true
+  },
+  {
+    "name": "framework",
+    "path": "apps/web/.next/static/chunks/framework-*.js",
+    "limit": "50 kB",
+    "gzip": true
+  },
+  {
+    "name": "main",
+    "path": "apps/web/.next/static/chunks/main-*.js",
+    "limit": "50 kB",
+    "gzip": true
+  }
+]
