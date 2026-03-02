@@ -1,0 +1,36 @@
+{
+  "name": "Covenant",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:22",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "forwardPorts": [3000, 4000, 5432, 6379],
+  "portsAttributes": {
+    "3000": { "label": "web" },
+    "4000": { "label": "api" },
+    "5432": { "label": "postgres" },
+    "6379": { "label": "redis" }
+  },
+  "postCreateCommand": "npm install && npx prisma generate --schema packages/db/prisma/schema.prisma",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "Prisma.prisma",
+        "bradlc.vscode-tailwindcss",
+        "GitHub.copilot",
+        "vitest.explorer"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "typescript.tsdk": "node_modules/typescript/lib"
+      }
+    }
+  },
+  "remoteEnv": {
+    "DATABASE_URL": "postgresql://covenant:covenant@localhost:5432/covenant",
+    "REDIS_URL": "redis://localhost:6379"
+  }
+}
