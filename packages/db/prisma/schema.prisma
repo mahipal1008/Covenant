@@ -1,0 +1,629 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ScanStatus {
+  queued
+  running
+  passed
+  failed
+  blocked
+}
+
+enum Severity {
+  critical
+  high
+  medium
+  low
+}
+
+enum FindingStatus {
+  open
+  triaged
+  fixed
+}
+
+enum IntegrationStatus {
+  connected
+  stubbed
+  needs_setup
+}
+
+enum ContractStatus {
+  passing
+  warning
+  violated
+}
+
+model User {
+  /// @sensitivity:internal
+  id                String          @id @default(cuid())
+  /// @sensitivity:pii
+  email             String          @unique
+  /// @sensitivity:pii
+  name              String
+  /// @sensitivity:pii
+  avatarUrl         String?
+  /// @sensitivity:secret
+  passwordHash      String?
+  memberships       Membership[]
+  auditEvents       AuditEvent[]
+  sessions          Session[]
+  apiTokensCreated  ApiToken[]      @relation("ApiTokenCreatedBy")
+  dataExportsRequested DataExportJob[] @relation("DataExportRequestedBy")
+  npsResponses      NpsResponse[]
+  /// @sensitivity:internal
+  createdAt         DateTime        @default(now())
+  /// @sensitivity:internal
+  updatedAt         DateTime        @updatedAt
+}
+
+model Organization {
+  id             String          @id @default(cuid())
+  name           String
+  slug           String          @unique
+  plan           String          @default("Startup")
+  memberships    Membership[]
+  projects       Project[]
+  repositories   Repository[]
+  scans          Scan[]
+  findings       Finding[]
+  contracts      IntentContract[]
+  integrations   Integration[]
+  subscriptions  Subscription[]
+  notifications  Notification[]
+  auditEvents    AuditEvent[]
+  apiTokens             ApiToken[]
+  webhookSubscriptions  WebhookSubscription[]
+  notificationPrefs     NotificationPreference[]
+  dataExportJobs        DataExportJob[]
+  usageRecords          UsageRecord[]
+  invoices              Invoice[]
+  featureFlags          FeatureFlagAssignment[]
+  npsResponses          NpsResponse[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model Membership {
+  id             String       @id @default(cuid())
+  userId         String
+  organizationId String
+  role           String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+
+  @@unique([userId, organizationId])
+}
+
+model Project {
+  id             String       @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  repositories   Repository[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Repository {
+  id             String       @id @default(cuid())
+  organizationId String
+  projectId      String?
+  name           String
+  provider       String
+  remoteUrl      String?
+  defaultBranch  String       @default("main")
+  language       String       @default("TypeScript")
+  lastCommitSha  String?
+  lastScannedAt  DateTime?
+  riskScore      Int          @default(100)
+  scanStatus     ScanStatus   @default(queued)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  project        Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  commits        Commit[]
+  scans          Scan[]
+  endpoints      Endpoint[]
+  dataModels     DataModel[]
+  queryTraces    QueryTrace[]
+  findings       Finding[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Commit {
+  id           String     @id @default(cuid())
+  repositoryId String
+  sha          String
+  author       String?
+  message      String
+  committedAt  DateTime
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  scans        Scan[]
+
+  @@unique([repositoryId, sha])
+}
+
+model Scan {
+  id                String       @id @default(cuid())
+  organizationId    String
+  repositoryId      String
+  commitId          String?
+  status            ScanStatus   @default(queued)
+  branch            String       @default("main")
+  commitSha         String?
+  filesAnalyzed     Int          @default(0)
+  endpointsAnalyzed Int          @default(0)
+  queriesAnalyzed   Int          @default(0)
+  riskScore         Int          @default(100)
+  startedAt         DateTime     @default(now())
+  completedAt       DateTime?
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  repository        Repository   @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  commit            Commit?      @relation(fields: [commitId], references: [id], onDelete: SetNull)
+  findings          Finding[]
+  queryTraces       QueryTrace[]
+  reports           Report[]
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+}
+
+model Finding {
+  id             String        @id @default(cuid())
+  organizationId String
+  repositoryId   String
+  scanId         String
+  severity       Severity
+  status         FindingStatus @default(open)
+  ruleId         String
+  title          String
+  summary        String
+  filePath       String
+  line           Int
+  endpoint       String
+  routeMethod    String
+  evidence       String
+  impact         String
+  suggestedFix   String
+  exploitSteps   Json
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  repository     Repository    @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  scan           Scan          @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model Endpoint {
+  id           String     @id @default(cuid())
+  repositoryId String
+  method       String
+  path         String
+  filePath     String
+  line         Int
+  authState    String     @default("unknown")
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  queryTraces  QueryTrace[]
+
+  @@unique([repositoryId, method, path, filePath])
+}
+
+model DataModel {
+  id            String     @id @default(cuid())
+  repositoryId  String
+  name          String
+  tenantKey     String?
+  sensitiveTags String[]
+  repository    Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
+  @@unique([repositoryId, name])
+}
+
+model QueryTrace {
+  id           String      @id @default(cuid())
+  repositoryId String
+  scanId       String?
+  endpointId   String?
+  filePath     String
+  line         Int
+  queryText    String
+  hasTenantKey Boolean     @default(false)
+  repository   Repository  @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  scan         Scan?       @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  endpoint     Endpoint?   @relation(fields: [endpointId], references: [id], onDelete: SetNull)
+  createdAt    DateTime    @default(now())
+}
+
+model TenantBoundary {
+  id             String       @id @default(cuid())
+  organizationId String
+  repositoryId   String
+  canonicalKey   String
+  aliases        String[]
+  requiredOn     String[]
+  createdAt      DateTime     @default(now())
+}
+
+model IntentContract {
+  id             String         @id @default(cuid())
+  organizationId String
+  name           String
+  plainEnglish   String
+  owner          String
+  status         ContractStatus @default(passing)
+  linkedFindings Int            @default(0)
+  lastCheckedAt  DateTime?
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model Report {
+  id        String   @id @default(cuid())
+  scanId    String
+  title     String
+  format    String
+  body      Json
+  scan      Scan     @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Integration {
+  id             String            @id @default(cuid())
+  organizationId String
+  provider       String
+  status         IntegrationStatus @default(stubbed)
+  config         Json?
+  lastSyncAt     DateTime?
+  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@unique([organizationId, provider])
+}
+
+model Subscription {
+  id             String       @id @default(cuid())
+  organizationId String
+  plan           String
+  status         String
+  stripeCustomerId String?
+  currentPeriodEnd DateTime?
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Notification {
+  id             String       @id @default(cuid())
+  organizationId String
+  channel        String
+  title          String
+  body           String
+  deliveredAt    DateTime?
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+}
+
+model AuditEvent {
+  id             String        @id @default(cuid())
+  organizationId String
+  userId         String?
+  actorEmail     String?
+  action         String
+  targetType     String
+  targetId       String?
+  ipAddress      String?
+  userAgent      String?
+  metadata       Json?
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt      DateTime      @default(now())
+
+  @@index([organizationId, createdAt])
+  @@index([organizationId, action])
+}
+
+/// In-product NPS responses (Session 5 §7).
+/// Score follows the 0-10 NPS standard; compute promoter/detractor
+/// percentages in the API rather than storing them denormalised.
+model NpsResponse {
+  /// @sensitivity:internal
+  id             String       @id @default(cuid())
+  /// @sensitivity:internal
+  organizationId String
+  /// @sensitivity:internal
+  userId         String?
+  /// @sensitivity:internal
+  score          Int
+  /// @sensitivity:pii
+  comment        String?      @db.VarChar(2000)
+  /// @sensitivity:internal
+  surface        String?      // e.g. "dashboard", "scan-detail"
+  /// @sensitivity:internal
+  createdAt      DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt])
+}
+
+/// Marketing lead capture submissions (Session 5 §4).
+/// Kept on a separate table from NpsResponse because the lifecycle
+/// (CRM sync, deletion-on-request) is independent.
+model Lead {
+  /// @sensitivity:internal
+  id        String   @id @default(cuid())
+  /// @sensitivity:pii
+  email     String
+  /// @sensitivity:pii
+  message   String?  @db.VarChar(4000)
+  /// @sensitivity:internal
+  source    String   // "home" | "pricing" | "contact"
+  /// @sensitivity:pii
+  ipAddress String?
+  /// @sensitivity:pii
+  userAgent String?
+  /// @sensitivity:internal
+  createdAt DateTime @default(now())
+
+  @@index([source, createdAt])
+}
+
+enum TokenScope {
+  read
+  write
+  admin
+}
+
+model ApiToken {
+  id             String       @id @default(cuid())
+  organizationId String
+  name           String
+  scope          TokenScope   @default(read)
+  prefix         String
+  hash           String       @unique
+  createdById    String?
+  lastUsedAt     DateTime?
+  revokedAt      DateTime?
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy      User?        @relation("ApiTokenCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt      DateTime     @default(now())
+
+  @@index([organizationId, createdAt])
+}
+
+model WebhookSubscription {
+  id             String              @id @default(cuid())
+  organizationId String
+  url            String
+  events         String[]
+  active         Boolean             @default(true)
+  secretHash     String
+  secretPrefix   String
+  organization   Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  deliveries     WebhookDelivery[]
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  @@index([organizationId])
+}
+
+enum WebhookDeliveryStatus {
+  delivered
+  failed
+  pending
+}
+
+model WebhookDelivery {
+  id             String                @id @default(cuid())
+  subscriptionId String
+  event          String
+  status         WebhookDeliveryStatus @default(pending)
+  responseCode   Int?
+  attempts       Int                   @default(1)
+  payload        Json
+  attemptedAt    DateTime              @default(now())
+  subscription   WebhookSubscription   @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId, attemptedAt])
+}
+
+model NotificationPreference {
+  id             String       @id @default(cuid())
+  organizationId String
+  eventType      String
+  email          Boolean      @default(true)
+  slack          Boolean      @default(true)
+  inApp          Boolean      @default(true)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([organizationId, eventType])
+}
+
+enum DataExportStatus {
+  queued
+  running
+  ready
+  expired
+  failed
+}
+
+model DataExportJob {
+  id             String           @id @default(cuid())
+  organizationId String
+  requestedById  String?
+  status         DataExportStatus @default(queued)
+  bytes          BigInt?
+  downloadUrl    String?
+  requestedAt    DateTime         @default(now())
+  readyAt        DateTime?
+  expiresAt      DateTime?
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  requestedBy    User?            @relation("DataExportRequestedBy", fields: [requestedById], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, requestedAt])
+}
+
+enum UsageMetric {
+  scan
+  repository
+  contract
+  llm_token
+}
+
+model UsageRecord {
+  id             String       @id @default(cuid())
+  organizationId String
+  metric         UsageMetric
+  quantity       Int          @default(1)
+  recordedAt     DateTime     @default(now())
+  metadata       Json?
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, metric, recordedAt])
+}
+
+enum InvoiceStatus {
+  draft
+  open
+  paid
+  void
+  trial
+}
+
+model Invoice {
+  id             String        @id @default(cuid())
+  organizationId String
+  number         String        @unique
+  amountCents    Int
+  currency       String        @default("USD")
+  status         InvoiceStatus @default(open)
+  periodStart    DateTime
+  periodEnd      DateTime
+  issuedAt       DateTime      @default(now())
+  paidAt         DateTime?
+  pdfUrl         String?
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, issuedAt])
+}
+
+model FeatureFlag {
+  key         String                  @id
+  description String
+  defaultOn   Boolean                 @default(false)
+  rollout     Int                     @default(0)
+  assignments FeatureFlagAssignment[]
+  updatedAt   DateTime                @updatedAt
+  createdAt   DateTime                @default(now())
+}
+
+model FeatureFlagAssignment {
+  id             String       @id @default(cuid())
+  organizationId String
+  flagKey        String
+  enabled        Boolean
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  flag           FeatureFlag  @relation(fields: [flagKey], references: [key], onDelete: Cascade)
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([organizationId, flagKey])
+}
+
+enum JobFailureStatus {
+  failed
+  retrying
+  abandoned
+}
+
+/// Dead-letter queue for BullMQ workers (master plan §4.3).
+/// Workers persist final failures here so the dashboard / ops can inspect
+/// them. Not tenant-scoped via the extension because some jobs are
+/// system-wide (regulation-sync, cve-watcher); we store organizationId as
+/// a nullable column instead.
+model JobFailure {
+  id             String           @id @default(cuid())
+  organizationId String?
+  queue          String
+  jobName        String
+  jobId          String
+  attempts       Int              @default(1)
+  status         JobFailureStatus @default(failed)
+  errorMessage   String
+  errorStack     String?
+  payload        Json
+  failedAt       DateTime         @default(now())
+
+  @@index([queue, failedAt])
+  @@index([organizationId, failedAt])
+}
+
+model Session {
+  id              String    @id @default(cuid())
+  userId          String
+  refreshTokenHash String   @unique
+  userAgent       String?
+  ipAddress       String?
+  expiresAt       DateTime
+  revokedAt       DateTime?
+  createdAt       DateTime  @default(now())
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+enum DataSubjectRequestType {
+  export
+  deletion
+}
+
+enum DataSubjectRequestStatus {
+  pending
+  scheduled
+  in_progress
+  completed
+  cancelled
+}
+
+/// Right-to-be-forgotten / data-subject-request log (Session 6 §5).
+/// Tracks the lifecycle of GDPR/CCPA requests with a 30-day grace period
+/// before deletion is irrevocably executed.
+model DataSubjectRequest {
+  /// @sensitivity:internal
+  id             String                   @id @default(cuid())
+  /// @sensitivity:internal
+  organizationId String
+  /// @sensitivity:internal
+  userId         String?
+  /// @sensitivity:pii
+  subjectEmail   String
+  /// @sensitivity:internal
+  type           DataSubjectRequestType
+  /// @sensitivity:internal
+  status         DataSubjectRequestStatus @default(pending)
+  /// @sensitivity:internal
+  reason         String?                  @db.VarChar(2000)
+  /// @sensitivity:internal
+  requestedAt    DateTime                 @default(now())
+  /// @sensitivity:internal
+  scheduledFor   DateTime
+  /// @sensitivity:internal
+  completedAt    DateTime?
+  /// @sensitivity:internal
+  auditTrail     Json                     @default("[]")
+  /// @sensitivity:internal
+  createdAt      DateTime                 @default(now())
+  /// @sensitivity:internal
+  updatedAt      DateTime                 @updatedAt
+
+  @@index([organizationId, status])
+  @@index([scheduledFor])
+}
