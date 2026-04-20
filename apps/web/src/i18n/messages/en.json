@@ -1,0 +1,25 @@
+{
+  "$comment": "English (en) UI strings — i18n source of truth. New keys must land here first.",
+  "common": {
+    "appName": "Covenant",
+    "tagline": "A living intelligence layer for SaaS codebases.",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "signOut": "Sign out",
+    "dashboard": "Dashboard",
+    "loading": "Loading…",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "errors": {
+    "generic": "Something went wrong.",
+    "unauthorized": "You need to sign in to continue.",
+    "notFound": "We couldn't find that page."
+  },
+  "dashboard": {
+    "riskScore": "Risk score",
+    "openFindings": "Open findings",
+    "scansThisWeek": "Scans this week",
+    "lastScan": "Last scan"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "$comment": "Spanish (es) stub locale. Validates the i18n pipeline; production strings need a real translator pass.",
+  "common": {
+    "appName": "Covenant",
+    "tagline": "Una capa de inteligencia viva para tu base de código SaaS.",
+    "signIn": "Iniciar sesión",
+    "signUp": "Crear cuenta",
+    "signOut": "Cerrar sesión",
+    "dashboard": "Panel",
+    "loading": "Cargando…",
+    "save": "Guardar",
+    "cancel": "Cancelar"
+  },
+  "errors": {
+    "generic": "Algo salió mal.",
+    "unauthorized": "Debes iniciar sesión para continuar.",
+    "notFound": "No pudimos encontrar esa página."
+  },
+  "dashboard": {
+    "riskScore": "Puntuación de riesgo",
+    "openFindings": "Hallazgos abiertos",
+    "scansThisWeek": "Análisis esta semana",
+    "lastScan": "Último análisis"
+  }
+}
