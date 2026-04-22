@@ -1,0 +1,47 @@
+{
+  "name": "@covenant/cli",
+  "version": "0.1.0",
+  "description": "Covenant CLI — scan repositories, query findings, and gate PRs from your terminal.",
+  "type": "module",
+  "bin": { "covenant": "./dist/index.js" },
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "test": "tsx src/cli.test.ts",
+    "prepublishOnly": "npm run build && node -e \"require('node:fs').chmodSync('dist/index.js', 0o755)\""
+  },
+  "keywords": [
+    "covenant",
+    "security",
+    "saas",
+    "static-analysis",
+    "tenant-isolation",
+    "cli"
+  ],
+  "homepage": "https://covenant.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/covenantdev/covenant.git",
+    "directory": "packages/cli"
+  },
+  "bugs": { "url": "https://github.com/covenantdev/covenant/issues" },
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@covenant/shared": "0.1.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.7",
+    "typescript": "^5.9.3"
+  }
+}
