@@ -1,0 +1,63 @@
+{
+  "name": "covenant",
+  "displayName": "Covenant",
+  "description": "Surface Covenant findings, intent contracts, and tenant-isolation gaps inline in VS Code.",
+  "version": "0.1.0",
+  "publisher": "covenant",
+  "license": "Apache-2.0",
+  "author": { "name": "Covenant", "email": "hello@covenant.dev" },
+  "homepage": "https://covenant.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/covenantdev/covenant.git",
+    "directory": "extensions/vscode"
+  },
+  "bugs": { "url": "https://github.com/covenantdev/covenant/issues" },
+  "icon": "media/icon.png",
+  "categories": ["Linters", "Other"],
+  "keywords": ["security", "tenant", "saas", "covenant"],
+  "engines": { "vscode": "^1.92.0" },
+  "main": "./dist/extension.js",
+  "activationEvents": ["onStartupFinished"],
+  "contributes": {
+    "configuration": {
+      "title": "Covenant",
+      "properties": {
+        "covenant.apiUrl": {
+          "type": "string",
+          "default": "https://api.covenant.dev",
+          "description": "Covenant API base URL."
+        },
+        "covenant.accessToken": {
+          "type": "string",
+          "default": "",
+          "description": "Bearer token. Prefer storing via the `Covenant: Sign in` command."
+        },
+        "covenant.severityFilter": {
+          "type": "array",
+          "default": ["critical", "high"],
+          "items": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+          "description": "Severities to surface as diagnostics."
+        }
+      }
+    },
+    "commands": [
+      { "command": "covenant.signIn", "title": "Covenant: Sign in" },
+      { "command": "covenant.refresh", "title": "Covenant: Refresh findings" },
+      { "command": "covenant.openFinding", "title": "Covenant: Open finding in browser" }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "tsc -p ./",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package --no-dependencies",
+    "publish": "vsce publish --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.92.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.3",
+    "@vscode/vsce": "^3.0.0"
+  }
+}

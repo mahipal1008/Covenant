@@ -1,0 +1,25 @@
+<idea-plugin>
+    <id>dev.covenant.jetbrains</id>
+    <name>Covenant</name>
+    <vendor email="hello@covenant.dev" url="https://covenant.dev">Covenant</vendor>
+
+    <description><![CDATA[
+        Surface Covenant findings and tenant-isolation gaps inline in JetBrains IDEs.
+        Pairs with the Covenant platform — see https://covenant.dev.
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup id="Covenant" displayType="BALLOON"/>
+    </extensions>
+
+    <actions>
+        <action id="Covenant.Refresh"
+                class="dev.covenant.jetbrains.RefreshAction"
+                text="Refresh Covenant Findings"
+                description="Pulls the latest findings from Covenant.">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
