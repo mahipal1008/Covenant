@@ -1,0 +1,15 @@
+apiVersion: v2
+name: covenant
+description: Covenant — multi-tenant repository risk engine
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - security
+  - prisma
+  - fastify
+maintainers:
+  - name: Covenant Engineering
+home: https://covenant.dev
+sources:
+  - https://github.com/covenant/covenant

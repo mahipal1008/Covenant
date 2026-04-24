@@ -1,0 +1,54 @@
+# Default values for the Covenant Helm chart.
+# Override per environment via -f values-prod.yaml etc.
+
+image:
+  repository: ghcr.io/covenant/api
+  tag: "0.1.0"
+  pullPolicy: IfNotPresent
+
+webImage:
+  repository: ghcr.io/covenant/web
+  tag: "0.1.0"
+  pullPolicy: IfNotPresent
+
+api:
+  replicaCount: 2
+  port: 4000
+  resources:
+    requests: { cpu: "100m", memory: "256Mi" }
+    limits: { cpu: "1000m", memory: "1Gi" }
+
+worker:
+  replicaCount: 1
+  resources:
+    requests: { cpu: "100m", memory: "256Mi" }
+    limits: { cpu: "2000m", memory: "2Gi" }
+
+web:
+  replicaCount: 2
+  port: 3000
+
+ingress:
+  enabled: true
+  className: nginx
+  apiHost: api.covenant.local
+  webHost: app.covenant.local
+  tls: []
+
+env:
+  NODE_ENV: production
+  COVENANT_API_URL: http://covenant-api:4000
+
+# Reference an existing Secret. Required keys:
+#   DATABASE_URL, REDIS_URL, COVENANT_JWT_PRIVATE_KEY_JWK,
+#   COVENANT_JWT_PUBLIC_KEY_JWK, GITHUB_WEBHOOK_SECRET, STRIPE_WEBHOOK_SECRET
+existingSecretName: covenant-secrets
+
+postgresql:
+  enabled: false
+redis:
+  enabled: false
+
+serviceAccount:
+  create: true
+  name: ""
