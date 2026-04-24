@@ -1,0 +1,61 @@
+{
+  "_comment": "Slack App manifest — paste at https://api.slack.com/apps?new_app=1 to create the app. Once approved, distribute via the Marketplace (public) or via the install URL on /integrations (private). Session 7 §11.",
+  "display_information": {
+    "name": "Covenant",
+    "description": "Living intelligence for your SaaS codebase — security, drift, compliance, and cost briefings in Slack.",
+    "background_color": "#0b0d10",
+    "long_description": "Covenant runs 20 always-on agents that document, secure, audit, and enforce your codebase. This Slack app delivers severity-aware digests, on-call pages for blocking findings, and approval workflows for intent contracts."
+  },
+  "features": {
+    "bot_user": {
+      "display_name": "Covenant",
+      "always_online": true
+    },
+    "slash_commands": [
+      {
+        "command": "/covenant",
+        "description": "Query Covenant from Slack",
+        "usage_hint": "scan <repo> | findings <severity> | gates <repo>",
+        "should_escape": false,
+        "url": "https://api.covenant.dev/v1/slack/commands"
+      }
+    ]
+  },
+  "oauth_config": {
+    "redirect_urls": ["https://app.covenant.dev/integrations/slack/callback"],
+    "scopes": {
+      "bot": [
+        "channels:read",
+        "chat:write",
+        "chat:write.public",
+        "commands",
+        "files:write",
+        "groups:read",
+        "im:write",
+        "links:read",
+        "links:write",
+        "team:read",
+        "users:read",
+        "users:read.email"
+      ]
+    }
+  },
+  "settings": {
+    "event_subscriptions": {
+      "request_url": "https://api.covenant.dev/v1/slack/events",
+      "bot_events": [
+        "app_home_opened",
+        "app_mention",
+        "link_shared",
+        "team_join"
+      ]
+    },
+    "interactivity": {
+      "is_enabled": true,
+      "request_url": "https://api.covenant.dev/v1/slack/interactivity"
+    },
+    "org_deploy_enabled": true,
+    "socket_mode_enabled": false,
+    "token_rotation_enabled": true
+  }
+}
