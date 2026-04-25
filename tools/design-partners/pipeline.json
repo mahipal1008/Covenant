@@ -1,0 +1,15 @@
+{
+  "$schema": "./pipeline.schema.json",
+  "updatedAt": "2026-04-26",
+  "partners": [
+    {
+      "slug": "example-acme",
+      "company": "Example, Inc. (placeholder)",
+      "primaryContact": { "name": "TBD", "role": "CTO", "email": "tbd@example.com" },
+      "status": "prospect",
+      "fitScore": 0,
+      "notes": "Replace with real pipeline entries before launch outreach.",
+      "history": []
+    }
+  ]
+}

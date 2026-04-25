@@ -1,0 +1,26 @@
+# OWASP ZAP rule overrides — Session 8 §4.
+# Format: <ruleId>	<action>	<reason>
+# Actions: IGNORE | INFO | WARN | FAIL
+# Anything not listed defaults to FAIL on the baseline scan.
+
+# Informational: cookie attributes are intentionally permissive on
+# the public marketing pages; the app subdomain enforces strict.
+10010	INFO	Cookie no HttpOnly flag (marketing only)
+10011	INFO	Cookie without Secure flag (marketing only)
+
+# Informational: we serve a CSP report-only header on legacy routes
+# during the rollout; tracked in docs/postmortems/csp-rollout.md.
+10038	WARN	CSP not fully enforced on legacy routes — fix before launch.
+
+# Demoted: x-powered-by is intentionally absent on api.* (Fastify
+# disables it). False positives on the marketing CDN.
+10037	IGNORE	X-Powered-By disclosure (vendor CDN, no app data)
+
+# Auth bypass and tenant-isolation checks must always FAIL hard.
+40018	FAIL	SQL Injection
+40012	FAIL	Cross-Site Scripting (Reflected)
+40014	FAIL	Cross-Site Scripting (Persistent)
+40016	FAIL	Cross-Site Scripting (Persistent — Prime)
+40017	FAIL	Cross-Site Scripting (Persistent — Spider)
+90019	FAIL	Server-Side Code Injection
+90020	FAIL	Remote OS Command Injection
