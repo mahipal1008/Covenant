@@ -1,0 +1,56 @@
+---
+title: "Anatomy of a tenant leak: how a missing where clause cost a hostel chain $2.3M"
+excerpt: "A real incident, redacted, with the timeline, the query, the blast radius, and the fix."
+date: "2026-04-18"
+readTime: "9 min"
+category: "Security research"
+author: "Asha Iyer"
+tone: "border-rose-200 bg-rose-50 text-rose-700"
+---
+
+# Anatomy of a tenant leak
+
+A redacted post-mortem of a real customer incident. Names are
+changed, numbers are rounded, and the schema is paraphrased. The
+mechanics are not.
+
+## The query that did the damage
+
+The team had a perfectly normal looking query:
+
+```sql
+SELECT id, guest_name, total_cents
+FROM bookings
+WHERE created_at > now() - interval '24 hours';
+```
+
+Notice what's missing? The `organization_id` predicate. In a row-
+level security setup that's a hard error, but RLS was off on this
+table because of a long-forgotten migration that ran on a Tuesday.
+
+## The blast radius
+
+- **3,142** bookings exposed across **84** hostel tenants.
+- **$2.3M** in chargebacks, refunds, and incident response fees.
+- **41 days** between the regression landing and a customer noticing.
+
+## What Covenant would have caught
+
+The `tenant-leak` agent flags any query that touches a tenant-scoped
+table without a constraining predicate that maps back to the active
+organization context. In this case the offending PR would have
+shipped with a blocking finding before merge.
+
+## The fix
+
+A two-line change plus a regression test:
+
+```ts
+const rows = await prisma.booking.findMany({
+  where: { organizationId: ctx.organizationId, createdAt: { gt: cutoff } }
+});
+```
+
+We turned RLS back on globally and added a CI check that fails the
+build whenever a Prisma query targets a tenant-scoped model without
+a tenant predicate.

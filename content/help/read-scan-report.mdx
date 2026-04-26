@@ -1,0 +1,19 @@
+---
+title: "Reading a scan report"
+category: "Findings"
+read: "4 min"
+excerpt: "Each finding has three sections: where it is, why it matters, and how to fix it."
+---
+
+# Reading a scan report
+
+Each finding has three sections: where it is, why it matters, and
+how to fix it. The first two come from the agent council; the
+third is a deterministic patch suggestion you can copy into your
+IDE.
+
+## Severity is opinionated
+
+Severity is calculated from blast radius (which tenants can be
+affected), exploitability (is auth required), and reversibility
+(is data leaked or only read). We never inflate severity.

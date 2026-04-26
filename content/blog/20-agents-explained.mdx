@@ -1,0 +1,50 @@
+---
+title: "Why we built 20 specialized agents instead of one giant prompt"
+excerpt: "The tradeoffs we made between cost, latency, accuracy, and explainability across the agent fleet."
+date: "2026-04-09"
+readTime: "12 min"
+category: "Engineering"
+author: "Diego Marquez"
+tone: "border-teal/30 bg-teal/10 text-teal"
+---
+
+# Why 20 agents
+
+The temptation when you start a code-intelligence product is to
+ship a single mega-prompt: feed it the diff, ask it to "find all the
+problems," and call it a day. We tried it. It does not work at the
+scale a SaaS team needs.
+
+## What broke at one prompt
+
+- **Cost** scaled linearly with diff size. A 4,000-line PR was
+  $0.40 per scan. Multiply by every commit on every repo.
+- **Latency** was unbounded. The model would happily spend 90s
+  reasoning end to end, blocking the merge.
+- **Explainability** was the worst part. When a finding was wrong
+  there was no surface area to debug — it was the model's vibe.
+
+## What 20 agents bought us
+
+- Each agent has a **single contract**: input shape, output shape,
+  and a deterministic test fixture. Failures are localizable.
+- The cheap agents (lint-style, regex-class) finish in milliseconds
+  and gate whether the expensive ones run at all.
+- An agent that misbehaves can be **rolled back independently**.
+  We do this maybe twice a week.
+
+## The fleet
+
+- 5 structural agents (parsers, dependency graphs, intent contracts).
+- 7 security agents (tenant-leak, secret-leak, deserialization,
+  SSRF, AuthN/Z drift, supply-chain, IaC).
+- 4 economic agents (blast-radius, license-cost, infra-cost, churn).
+- 4 compliance agents (GDPR, DPDP, SOC2, HIPAA).
+
+## Routing
+
+A small router classifies each diff and decides which agents to
+invoke. The router is itself an agent — and the easiest one to
+explain, because its output is just a list of agent IDs.
+
+The result: median scan latency under 8 seconds, p99 under 35.

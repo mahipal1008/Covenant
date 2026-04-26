@@ -1,0 +1,24 @@
+---
+title: "Author your first intent contract"
+category: "Contracts"
+read: "5 min"
+excerpt: "Plain-English controls that compile into runtime checks signed by a real human."
+---
+
+# Author your first intent contract
+
+An intent contract is a plain-English assertion about how the
+codebase should behave. Covenant compiles each contract into a
+deterministic runtime check that runs on every scan.
+
+## Anatomy of a contract
+
+- **Subject** — the area of the code (e.g. `bookings.read`).
+- **Constraint** — the rule (e.g. "must be scoped to the active org").
+- **Owner** — a real human signature with timestamp.
+
+## Failing fast
+
+A contract that cannot be compiled fails the scan immediately. A
+contract that compiles but fails at runtime emits a finding at
+severity matching the constraint's blast radius.

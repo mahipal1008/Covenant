@@ -1,0 +1,24 @@
+---
+title: "Configure outbound webhooks"
+category: "Integrations"
+read: "3 min"
+excerpt: "Subscribe to scan, finding, and contract events with HMAC-signed deliveries."
+---
+
+# Configure outbound webhooks
+
+Covenant ships scan, finding, and contract events to any HTTPS
+endpoint you register. Every delivery is HMAC-SHA256 signed with the
+secret you provide at subscription time.
+
+## Recommended setup
+
+- One subscription per consumer system (Slack, PagerDuty, custom
+  pipeline). This keeps retry budgets isolated.
+- Store the signing secret in a secret manager and rotate quarterly.
+- Verify the signature **before** parsing the body.
+
+## Replay protection
+
+Each delivery includes a UUID and timestamp. Reject deliveries older
+than five minutes and dedupe on the UUID for at least an hour.
