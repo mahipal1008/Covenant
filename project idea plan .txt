@@ -1,0 +1,234 @@
+Covenant — The Living Intelligence Layer for Software
+
+One Line
+Your codebase gets a brain that documents, secures, audits, predicts, and enforces itself — forever.
+
+The Core Insight
+Every tool today is reactive and static. Covenant is proactive and living. Code changes → Covenant updates everything automatically. No human triggers anything after initial setup.
+
+Full Agent Architecture
+Layer 1 — Understanding Agents
+(What does this codebase actually do?)
+Agent 1 — Architect
+
+Maps full codebase: routes, controllers, middleware, DB models, tenant boundaries
+Builds a living semantic graph that updates on every commit
+Understands implicit relationships between files nobody documented
+Output: JSON knowledge graph, visual dependency map
+
+Agent 2 — Archaeologist
+
+Reads entire git history, not just current code
+Understands why decisions were made, not just what changed
+"This auth check was added after a breach in commit a3f9c2. Your PR removes it."
+Preserves institutional memory when senior devs leave
+Output: Decision log, risk-tagged commit timeline
+
+Agent 3 — Tribal Knowledge Mapper (microservices)
+
+Maps implicit contracts between services nobody wrote down
+Service A assumes Service B always returns tenant_id — AI makes that explicit
+Detects silent breaking changes across repos before deploy
+Output: Cross-repo dependency graph, implicit contract registry
+
+
+Layer 2 — Documentation Agents
+(Write and maintain everything automatically)
+Agent 4 — Doc Writer
+
+Generates full API docs from raw code
+Auto-updates when code changes — never stale
+Writes in plain English, not developer jargon
+Output: Hosted docs page, Markdown, OpenAPI spec
+
+Agent 5 — Example Generator
+
+Runnable curl, JS, Python snippets for every endpoint
+Auto-generates "Getting Started" guide
+Generates SDK usage examples
+Output: Interactive code playground
+
+Agent 6 — Changelog Narrator
+
+Every git commit → plain English changelog for humans
+"This PR removed tenant isolation from billing endpoint. Risk: HIGH."
+Three versions: developer, founder, investor/auditor
+Output: Auto-published changelog, Slack/email digest
+
+
+Layer 3 — Security Agents
+(Find what will kill you before it does)
+Agent 7 — Multi-Tenant Leak Detector
+
+Reads every DB query, flags missing tenant filters
+Understands your specific schema, not generic rules
+Output: Isolation score per endpoint, ranked risk list
+
+Agent 8 — Adversarial Simulator
+
+Simulates full attacker decision tree against your codebase
+"Attacker hits /api/reports without tenant_id → receives another tenant's data in 2 hops."
+Full exploit chain, reproduced automatically
+Output: Exploit report with exact reproduction steps + fix
+
+Agent 9 — Auth Flow Auditor
+
+Maps every protected vs unprotected route
+Finds privilege escalation paths
+Detects JWT/session handling mistakes
+Output: Auth coverage heatmap
+
+Agent 10 — Dependency Threat Monitor
+
+Watches your package.json/requirements continuously
+When a CVE drops for a dependency: immediately shows which of YOUR code paths use the vulnerable function
+Not just "update lodash" — "lodash.merge is called in 3 places that process user input. Here they are."
+Output: Contextual CVE reports, not generic alerts
+
+
+Layer 4 — Intent & Compliance Agents
+(Does code do what you promised?)
+Agent 11 — Intent Drift Monitor (most unique)
+
+You write behavioral contracts once in plain English:
+"No hostel admin sees another hostel's billing data."
+"Free tier users cannot access export endpoints."
+Every PR, every deploy → AI checks if code still honors contracts
+Flags drift before it ships
+This replaces 40% of manual QA
+Output: Contract violation report, PR comment, block deploy option
+
+Agent 12 — Regulatory Horizon Scanner (nobody has this)
+
+Monitors upcoming global laws: GDPR amendments, India DPDP Act, EU AI Act, CCPA changes
+Maps each regulation to specific lines in your codebase before enforcement date
+"DPDP Act Section 8 enforced in 60 days. You have 4 violations. Exact files below."
+Output: Compliance countdown dashboard, violation map
+
+Agent 13 — Compliance-to-Code Mapper
+
+GDPR Article 25 → exact middleware responsible for data minimization
+SOC2 controls → mapped to actual functions
+One-click audit report, no consultant needed
+Output: Audit-ready compliance report, evidence package
+
+
+Layer 5 — Economic & Predictive Agents
+(What does code risk actually cost?)
+Agent 14 — Economic Blast Radius (nobody has this)
+
+Every function gets a revenue tag via integration with Stripe/analytics
+processPayment() fails → $X/minute lost
+Before any deploy: "This PR puts $4,200/hour at risk. Here's why."
+Developers speak the language of money. Founders understand code risk.
+Output: Revenue risk score per PR, endpoint economics dashboard
+
+Agent 15 — Codebase Time Machine (temporal intelligence)
+
+Builds semantic timeline of capability changes, not just commits
+"Your API handled 200 concurrent users in March. After Redis change in April, degrades at 80. You haven't noticed because staging traffic is low."
+Finds gradual regressions nobody caught
+Output: Performance archaeology report, degradation timeline
+
+Agent 16 — Behavioral Regression Detector
+
+Before merge: checks if PR changes documented behavior anywhere
+Catches breaking changes before they ship
+GitHub Action integration, blocks merge on critical drift
+Output: Behavior diff report, merge gate
+
+Agent 17 — Technical Debt Economist
+
+Not just "this code is messy"
+"This spaghetti auth module costs your team 3.2 hours/week in bug fixes. Refactor ROI: 6 weeks."
+Prioritizes debt by business impact, not code aesthetics
+Output: Debt ROI report, prioritized refactor queue
+
+
+Layer 6 — Team Intelligence Agents
+(Organizational layer nobody is thinking about)
+Agent 18 — Knowledge Bus Factor Analyzer (unique)
+
+"Only one developer understands the payment module. If they leave, you lose 14 critical business rules."
+Maps knowledge concentration across team
+Flags single points of failure in human expertise
+Output: Knowledge risk map, documentation priority queue
+
+Agent 19 — Onboarding Accelerator
+
+New developer joins → Covenant generates personalized codebase tour
+"You're working on billing. Here are the 8 files most relevant to you, why they exist, and the 3 decisions you must not break."
+Cuts onboarding from weeks to days
+Output: Personalized onboarding doc per developer role
+
+Agent 20 — PR Context Enricher
+
+Every PR automatically gets: affected business logic, blast radius, security implications, intent contract status, related past decisions
+Reviewer opens PR → full context already there
+Output: Auto-generated PR description, reviewer briefing
+
+
+Product Layers (What Users See)
+┌─────────────────────────────────────────────┐
+│              Covenant Dashboard              │
+│  Docs | Security | Intent | Economics | Team │
+└─────────────────────────────────────────────┘
+              ↕              ↕
+    GitHub Integration    Slack/Email Alerts
+              ↕              ↕
+         CI/CD Gates    API (for custom tools)
+              ↕
+    ┌─────────────────────┐
+    │   Semantic Core     │  ← Living graph
+    │   (updates on push) │
+    └─────────────────────┘
+              ↕
+         20 Agents
+              ↕
+    Your Codebase(s)
+
+
+Build Roadmap
+
+Semantic core: codebase ingestion + living graph
+Agent 1 (Architect) + Agent 4 (Doc Writer) + Agent 5 (Example Generator)
+GitHub integration: webhook on push → auto-update
+Basic dashboard: docs view
+Goal: Dogfood . Docs write themselves.
+
+
+Agent 7 (Multi-tenant leak detector)
+Agent 8 (Adversarial simulator)
+Agent 9 (Auth auditor)
+Security dashboard: isolation score, exploit reports
+Goal: First paying customer. Target: funded B2B SaaS teams.
+
+
+Agent 11 (Intent drift monitor)
+Agent 16 (Behavioral regression detector)
+Agent 6 (Changelog narrator)
+GitHub PR integration: auto-comments, merge gates
+Goal: Developers use it daily, not just weekly.
+
+
+Agent 14 (Economic blast radius) — Stripe integration
+Agent 12 (Regulatory horizon scanner)
+Agent 13 (Compliance-to-code mapper)
+Agent 17 (Technical debt economist)
+Goal: Enterprise sales unlocked. SOC2 audit use case.
+
+
+Agent 2 (Archaeologist)
+Agent 18 (Knowledge bus factor)
+Agent 19 (Onboarding accelerator)
+Agent 20 (PR context enricher)
+Goal: Sticky. Team can't remove it without losing institutional memory.
+
+
+Monetization
+TierPriceIncludesIndie$49/moDocs + changelog + basic securityStartup$199/mo+ Intent monitoring + blast radius + auth auditScale$499/mo+ Compliance mapping + adversarial simulation + archaeologyEnterprise$1,499/mo+ Regulatory scanner + cross-repo + team intelligence + SOC2 package
+One SOC2 audit saved = customer pays 12 months upfront without hesitation.
+
+
+Final Name: Covenant
+The promises your code makes — enforced automatically, forever.You said: 
