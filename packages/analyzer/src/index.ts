@@ -61,21 +61,32 @@ const queryMethods = new Set([
   "findMany",
   "findFirst",
   "findUnique",
+  "findUniqueOrThrow",
+  "findFirstOrThrow",
   "update",
   "updateMany",
   "delete",
   "deleteMany",
   "create",
   "createMany",
+  "upsert",
+  "aggregate",
+  "groupBy",
+  "count",
   "$queryRaw",
+  "$queryRawUnsafe",
   "$executeRaw",
+  "$executeRawUnsafe",
   "query",
   "select",
   "from"
 ]);
 
+// Tenant-isolation column names recognised by the A1 boundary check. Keep this
+// list focused on multi-tenant primary keys that actually appear in Covenant's
+// Prisma schema; spurious hits cause noise in the analyzer report.
 const tenantBoundaryPattern =
-  /\b(tenantId|tenant_id|organizationId|organization_id|orgId|org_id|workspaceId|workspace_id|companyId|company_id|hostelId|hostel_id)\b/i;
+  /\b(tenantId|tenant_id|organizationId|organization_id|orgId|org_id|workspaceId|workspace_id|companyId|company_id)\b/i;
 const sensitiveDataPattern =
   /\b(invoice|billing|payment|payout|subscription|reservation|guest|customer|user|report|export|admin|ledger)\b/i;
 const rawSqlPattern = /\b(select|update|delete)\s+.*\b(from|where)\b/i;

@@ -57,10 +57,11 @@ const fixture: SourceFileInput[] = [
     path: "src/routes/auth-noratelimit.ts",
     content: `app.post("/v1/auth/login", async (req, reply) => { return { ok: true }; });`
   },
-  // A11 — secret leaks
+  // A11 — secret leaks (canonical AWS example values — see
+  // https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-quotas.html)
   {
     path: "src/secrets/leak.ts",
-    content: `const k = "AKIAABCDEFGHIJKLMNOP"; const s = "sk_live_${"a".repeat(30)}";`
+    content: `const k = "AKIAIOSFODNN7EXAMPLE"; const s = "sk_live_${"a".repeat(30)}";`
   },
   // A12 — restrictive license
   {

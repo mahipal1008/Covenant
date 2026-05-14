@@ -1,19 +1,39 @@
+# Local dev stack. NOT for production — see deploy/helm/covenant for that.
+# Postgres + Redis are bound to 127.0.0.1 so the dev DSN is never reachable
+# from the LAN. Credentials are read from .env (or fall back to clearly-fake
+# defaults that only work on loopback).
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:16.4-alpine
     environment:
-      POSTGRES_USER: covenant
-      POSTGRES_PASSWORD: covenant
-      POSTGRES_DB: covenant
+      POSTGRES_USER: ${POSTGRES_USER:-covenant}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_only_change_me}
+      POSTGRES_DB: ${POSTGRES_DB:-covenant}
     ports:
-      - "5433:5432"
+      - "127.0.0.1:5433:5432"
     volumes:
       - covenant_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-covenant} -d $${POSTGRES_DB:-covenant}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
 
   redis:
-    image: redis:7-alpine
+    image: redis:7.4-alpine
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
     ports:
-      - "6380:6379"
+      - "127.0.0.1:6380:6379"
+    volumes:
+      - covenant_redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
 
 volumes:
   covenant_postgres:
+  covenant_redis:

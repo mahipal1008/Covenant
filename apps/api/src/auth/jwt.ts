@@ -44,6 +44,16 @@ async function loadKeys(): Promise<KeyMaterial> {
     return cached;
   }
 
+  // SECURITY: in production we MUST NOT generate an ephemeral, extractable
+  // RSA keypair — that would silently rotate every restart, leak the
+  // private JWK through /.well-known/jwks.json refresh, and prevent token
+  // revocation. Fail boot loudly so the operator wires COVENANT_JWT_*_JWK.
+  if ((process.env["NODE_ENV"] ?? "development") === "production") {
+    throw new Error(
+      "jwt: COVENANT_JWT_PRIVATE_KEY_JWK and COVENANT_JWT_PUBLIC_KEY_JWK must be set in production"
+    );
+  }
+
   // Dev-mode ephemeral keypair. Tokens issued here will not survive an
   // API restart — exactly what you want for local dev and tests.
   const { privateKey, publicKey } = await generateKeyPair("RS256", { extractable: true });

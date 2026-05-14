@@ -5,16 +5,19 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getPost, listPosts, renderMarkdown } from "@/lib/blog";
 
+// Next 16 makes route `params` a Promise on dynamic segments — do not
+// access `.slug` directly. Reviewed: production-readiness-plan.md §H6-web.
 interface Params {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export function generateStaticParams() {
   return listPosts().map((p) => ({ slug: p.slug }));
 }
 
-export function generateMetadata({ params }: Params) {
-  const post = getPost(params.slug);
+export async function generateMetadata({ params }: Params) {
+  const { slug } = await params;
+  const post = getPost(slug);
   if (!post) return { title: "Not found" };
   return {
     title: `${post.title} | Covenant blog`,
@@ -24,8 +27,9 @@ export function generateMetadata({ params }: Params) {
   };
 }
 
-export default function BlogPostPage({ params }: Params): JSX.Element {
-  const post = getPost(params.slug);
+export default async function BlogPostPage({ params }: Params): Promise<JSX.Element> {
+  const { slug } = await params;
+  const post = getPost(slug);
   if (!post) notFound();
   const articleJsonLd = {
     "@context": "https://schema.org",

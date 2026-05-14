@@ -72,7 +72,7 @@ export function buildApp() {
         "script-src": ["'self'"],
         "style-src": ["'self'", "'unsafe-inline'"],
         "img-src": ["'self'", "data:", "blob:"],
-        "connect-src": ["'self'", config.corsOrigin],
+        "connect-src": ["'self'", ...config.corsOrigins],
         "frame-ancestors": ["'none'"],
         "object-src": ["'none'"],
         "base-uri": ["'self'"],

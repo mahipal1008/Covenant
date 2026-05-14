@@ -172,8 +172,8 @@ async function main() {
 
   // ---------- New surfaces (account / billing depth) ----------
   const tokenSeeds = [
-    { id: "tok_demo_ci", name: "CI / GitHub Actions", scope: "write" as const, prefix: "cov_live_a1b2", hash: "seed:ci", createdById: user.id, lastUsedAt: new Date() },
-    { id: "tok_demo_ro", name: "Read-only dashboard mirror", scope: "read" as const, prefix: "cov_live_c3d4", hash: "seed:ro", createdById: user.id, lastUsedAt: null }
+    { id: "tok_demo_ci", name: "CI / GitHub Actions", scope: "write" as const, prefix: "cov_test_EXAMPLE_a1b2", hash: "seed:ci", createdById: user.id, lastUsedAt: new Date() },
+    { id: "tok_demo_ro", name: "Read-only dashboard mirror", scope: "read" as const, prefix: "cov_test_EXAMPLE_c3d4", hash: "seed:ro", createdById: user.id, lastUsedAt: null }
   ];
   for (const t of tokenSeeds) {
     await prisma.apiToken.upsert({
@@ -193,7 +193,7 @@ async function main() {
       events: ["scan.completed", "finding.created", "contract.violated"],
       active: true,
       secretHash: "seed:whsec",
-      secretPrefix: "whsec_d3m"
+      secretPrefix: "whsec_test_EXAMPLE_d3m"
     }
   });
   // Wipe + reseed deliveries so we always have a stable 8-entry tail

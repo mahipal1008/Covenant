@@ -99,7 +99,15 @@ const PUBLIC_PATH_PREFIXES = [
 
 function isPublicPath(rawUrl: string): boolean {
   const path = rawUrl.split("?")[0] ?? rawUrl;
-  return PUBLIC_PATH_PREFIXES.some((p) => path === p || path.startsWith(`${p}/`) || path.startsWith(p));
+  // SECURITY: do NOT use unanchored `startsWith(p)` here — that would treat
+  // `/v1/leads-admin` or `/v1/auth/logout-everywhere` as public and skip the
+  // Bearer-token / Casbin / tenant-ALS pre-handlers. Require either an exact
+  // match or a `/`-segment match (`p/...`). Prefixes that already end in `/`
+  // are matched by the leading `path === p` check (cleaned below).
+  return PUBLIC_PATH_PREFIXES.some((p) => {
+    const trimmed = p.endsWith("/") ? p.slice(0, -1) : p;
+    return path === trimmed || path.startsWith(`${trimmed}/`);
+  });
 }
 
 /**

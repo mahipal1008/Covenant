@@ -15,7 +15,7 @@ const fixture: SourceFileInput[] = [
   { path: "src/routes/perf.ts", content: `app.get("/v1/p", async () => { await prisma.a.findMany(); await prisma.b.findMany(); await prisma.c.findMany(); });` },
   { path: "src/util/err.ts", content: `try { f(); } catch (e) {} function g() { throw "no"; }` },
   { path: "src/routes/auth-noratelimit.ts", content: `app.post("/v1/auth/login", async () => ({ ok: 1 }));` },
-  { path: "src/secrets/leak.ts", content: `const k = "AKIAABCDEFGHIJKLMNOP"; const s = "sk_live_${"a".repeat(30)}";` },
+  { path: "src/secrets/leak.ts", content: `const k = "AKIAIOSFODNN7EXAMPLE"; const s = "sk_live_${"a".repeat(30)}";` },
   { path: "vendor/x/package.json", content: '{"name":"x","license":"AGPL-3.0","dependencies":{}}' },
   { path: "src/jobs/run.ts", content: `setInterval(t, 1000); queue.add("s", { id: 1 });` },
   { path: "src/routes/insecure-webhook.ts", content: `app.post("/v1/webhooks/x", async () => ({ ok: 1 }));` },

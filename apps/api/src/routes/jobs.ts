@@ -1,6 +1,13 @@
 import type { FastifyInstance } from "fastify";
+import { z } from "zod";
 import { prisma } from "@covenant/db";
+import { tenantPrisma } from "../db/tenant-guard";
 import { getScanQueue, getDigestQueue, getRegulationQueue, getCveQueue } from "../jobs/queue";
+
+const enqueueScanSchema = z.object({
+  repositoryId: z.string().min(1).max(64).regex(/^[A-Za-z0-9_-]+$/),
+  sourceMode: z.enum(["demo", "uploaded", "provider"]).optional()
+});
 
 /**
  * Operational endpoints for the BullMQ job system (master plan §4.3).
@@ -56,14 +63,28 @@ export async function jobsRoutes(app: FastifyInstance) {
   });
 
   app.post("/jobs/scan", async (request, reply) => {
-    const body = request.body as { repositoryId?: string; sourceMode?: "demo" | "uploaded" | "provider" } | undefined;
-    if (!body?.repositoryId) return reply.badRequest("repositoryId required");
+    const orgId = request.covenant?.organizationId;
+    if (!orgId) return reply.unauthorized("tenant context missing");
+    const parsed = enqueueScanSchema.safeParse(request.body);
+    if (!parsed.success) return reply.badRequest(parsed.error.message);
+
+    // SECURITY (production-readiness-plan.md §H3-api): confirm the repo
+    // belongs to the caller's org BEFORE enqueueing. tenant-guard's
+    // post-filter returns null for cross-tenant rows; an explicit
+    // existence check converts that to a 404 instead of silently burning
+    // the quota on a foreign or non-existent repositoryId.
+    const repo = await tenantPrisma.repository.findUnique({
+      where: { id: parsed.data.repositoryId },
+      select: { id: true }
+    });
+    if (!repo) return reply.notFound("repository not found");
+
     const job = await getScanQueue().add(
       "run-scan",
       {
-        organizationId: request.covenant.organizationId,
-        repositoryId: body.repositoryId,
-        sourceMode: body.sourceMode ?? "demo"
+        organizationId: orgId,
+        repositoryId: parsed.data.repositoryId,
+        sourceMode: parsed.data.sourceMode ?? "demo"
       },
       { attempts: 3, backoff: { type: "exponential", delay: 5000 } }
     );
